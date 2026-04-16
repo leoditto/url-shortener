@@ -19,7 +19,14 @@ A high-performance URL shortener built with Go, featuring PostgreSQL for persist
 ## Getting Started
 
 1. **Clone the repository**
-2. **Run the application using Docker Compose**:
+2. **Configure environment variables**:
+   Create your local environment file by copying the example:
+   ```bash
+   cp .env.example .env
+   ```
+   Open the `.env` file and update the values (especially `JWT_SECRET`) to match your local setup.
+
+3. **Run the application using Docker Compose**:
    ```bash
    docker-compose up --build
    ```

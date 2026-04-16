@@ -8,6 +8,10 @@ services:
       - DATABASE_URL=${DATABASE_URL}
       - REDIS_URL=${REDIS_URL}
       - JWT_SECRET=${JWT_SECRET}
+      - RATE_LIMIT_PERIOD=${RATE_LIMIT_PERIOD}
+      - RATE_LIMIT_PUBLIC_LIMIT=${RATE_LIMIT_PUBLIC_LIMIT}
+      - RATE_LIMIT_PRIVATE_LIMIT=${RATE_LIMIT_PRIVATE_LIMIT}
+      - RATE_LIMIT_AUTH_LIMIT=${RATE_LIMIT_AUTH_LIMIT}
     depends_on:
       db:
         condition: service_healthy

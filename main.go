@@ -78,6 +78,10 @@ func initConfig() {
 	viper.SetDefault("REDIS_URL", "localhost:6379")
 	viper.SetDefault("BASE_URL", "http://localhost:8080")
 	viper.SetDefault("JWT_SECRET", "secret-key-change-me")
+	viper.SetDefault("RATE_LIMIT_PERIOD", "1m")
+	viper.SetDefault("RATE_LIMIT_PUBLIC_LIMIT", 100)
+	viper.SetDefault("RATE_LIMIT_PRIVATE_LIMIT", 5)
+	viper.SetDefault("RATE_LIMIT_AUTH_LIMIT", 10)
 
 	viper.AutomaticEnv()
 
@@ -105,9 +109,19 @@ func main() {
 	go startStatsTicker(repo)
 
 	// Define different rates
-	publicRate := limiter.Rate{Period: 1 * time.Minute, Limit: 100} // High limit for redirects
-	privateRate := limiter.Rate{Period: 1 * time.Minute, Limit: 5}  // Low limit for shortening
-	authRate := limiter.Rate{Period: 1 * time.Minute, Limit: 10}    // Medium limit for login/register
+	ratePeriod := viper.GetDuration("RATE_LIMIT_PERIOD")
+	publicRate := limiter.Rate{
+		Period: ratePeriod,
+		Limit:  viper.GetInt64("RATE_LIMIT_PUBLIC_LIMIT"),
+	}
+	privateRate := limiter.Rate{
+		Period: ratePeriod,
+		Limit:  viper.GetInt64("RATE_LIMIT_PRIVATE_LIMIT"),
+	}
+	authRate := limiter.Rate{
+		Period: ratePeriod,
+		Limit:  viper.GetInt64("RATE_LIMIT_AUTH_LIMIT"),
+	}
 
 	// Initialize middlewares
 	publicMW := middleware.RateLimiter(repo.GetRedisClient(), publicRate)
