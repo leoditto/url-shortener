@@ -36,6 +36,8 @@ A high-performance URL shortener built with Go, featuring PostgreSQL for persist
 
 ## API Documentation
 
+A complete OpenAPI 3.0 specification is available in `/docs/openapi.yaml`. You can view it interactively by pasting its content into the Swagger Editor.
+
 ### 1. Public Endpoints
 
 #### Health Check
@@ -128,6 +130,7 @@ docker-compose -f docker-compose.test.yml up --build --abort-on-container-exit
 .
 ├── auth/               # JWT token generation logic
 ├── database/           # Repository pattern and data access logic
+├── docs/               # API documentation (OpenAPI/Swagger spec)
 ├── middleware/         # Auth and Rate Limiting middlewares
 ├── main.go             # Application entry point and routing
 ├── Dockerfile          # Multi-stage build for production
