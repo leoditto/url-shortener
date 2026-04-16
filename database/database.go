@@ -5,13 +5,13 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"os"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
 
 	_ "github.com/lib/pq"
 	"github.com/redis/go-redis/v9"
+	"github.com/spf13/viper"
 )
 
 // User represents a user in the system.
@@ -72,20 +72,14 @@ type postgresRedisRepository struct {
 // NewRepository initializes and returns a new Repository instance.
 func NewRepository(ctx context.Context) (Repository, error) {
 	// Initialize PostgreSQL
-	connStr := os.Getenv("DATABASE_URL")
-	if connStr == "" {
-		connStr = "postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable"
-	}
+	connStr := viper.GetString("DATABASE_URL")
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to Postgres: %w", err)
 	}
 
 	// Initialize Redis
-	redisAddr := os.Getenv("REDIS_URL")
-	if redisAddr == "" {
-		redisAddr = "localhost:6379"
-	}
+	redisAddr := viper.GetString("REDIS_URL")
 	rdb := redis.NewClient(&redis.Options{
 		Addr: redisAddr,
 	})

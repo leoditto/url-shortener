@@ -19,7 +19,14 @@ A high-performance URL shortener built with Go, featuring PostgreSQL for persist
 ## Getting Started
 
 1. **Clone the repository**
-2. **Run the application using Docker Compose**:
+2. **Configure environment variables**:
+   Create your local environment file by copying the example:
+   ```bash
+   cp .env.example .env
+   ```
+   Open the `.env` file and update the values (especially `JWT_SECRET`) to match your local setup.
+
+3. **Run the application using Docker Compose**:
    ```bash
    docker-compose up --build
    ```
@@ -28,6 +35,8 @@ A high-performance URL shortener built with Go, featuring PostgreSQL for persist
 ---
 
 ## API Documentation
+
+A complete OpenAPI 3.0 specification is available in `/docs/openapi.yaml`. You can view it interactively by pasting its content into the Swagger Editor.
 
 ### 1. Public Endpoints
 
@@ -121,6 +130,7 @@ docker-compose -f docker-compose.test.yml up --build --abort-on-container-exit
 .
 ├── auth/               # JWT token generation logic
 ├── database/           # Repository pattern and data access logic
+├── docs/               # API documentation (OpenAPI/Swagger spec)
 ├── middleware/         # Auth and Rate Limiting middlewares
 ├── main.go             # Application entry point and routing
 ├── Dockerfile          # Multi-stage build for production

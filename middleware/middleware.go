@@ -25,7 +25,13 @@ func RateLimiter(rdb *redis.Client, rate limiter.Rate) gin.HandlerFunc {
 		panic(fmt.Sprintf("Failed to initialize rate limiter store: %v", err))
 	}
 
-	return mgin.NewMiddleware(limiter.New(store, rate))
+	return mgin.NewMiddleware(limiter.New(store, rate), mgin.WithLimitReachedHandler(func(c *gin.Context) {
+		log.Printf("[Rate Limit] Warning: Limit reached for IP: %s | Path: %s", c.ClientIP(), c.Request.URL.Path)
+		c.AbortWithStatusJSON(http.StatusTooManyRequests, gin.H{
+			"success": false,
+			"message": "Rate limit exceeded. Please try again later.",
+		})
+	}))
 }
 
 // AuthMiddleware validates JWT tokens and sets the username in the context.
@@ -50,7 +56,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 			}
-			return auth.SecretKey, nil
+			return auth.GetSecretKey(), nil
 		})
 
 		if err != nil || !token.Valid {
