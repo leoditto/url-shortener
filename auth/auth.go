@@ -4,9 +4,12 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/spf13/viper"
 )
 
-var SecretKey = []byte("secret-key-change-me")
+func GetSecretKey() []byte {
+	return []byte(viper.GetString("JWT_SECRET"))
+}
 
 func GenerateToken(username string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -14,5 +17,5 @@ func GenerateToken(username string) (string, error) {
 		"exp":      time.Now().Add(time.Hour * 24).Unix(),
 	})
 
-	return token.SignedString(SecretKey)
+	return token.SignedString(GetSecretKey())
 }

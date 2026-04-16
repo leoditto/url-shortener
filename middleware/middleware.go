@@ -50,7 +50,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 			}
-			return auth.SecretKey, nil
+			return auth.GetSecretKey(), nil
 		})
 
 		if err != nil || !token.Valid {

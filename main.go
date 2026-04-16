@@ -17,6 +17,7 @@ import (
 	"url_shortener/middleware"
 
 	"github.com/redis/go-redis/v9"
+	"github.com/spf13/viper"
 	"github.com/ulule/limiter/v3"
 	"golang.org/x/crypto/bcrypt"
 
@@ -71,7 +72,24 @@ func startStatsTicker(repo database.Repository) {
 	}
 }
 
+func initConfig() {
+	viper.SetDefault("PORT", "8080")
+	viper.SetDefault("DATABASE_URL", "postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable")
+	viper.SetDefault("REDIS_URL", "localhost:6379")
+	viper.SetDefault("BASE_URL", "http://localhost:8080")
+	viper.SetDefault("JWT_SECRET", "secret-key-change-me")
+
+	viper.AutomaticEnv()
+
+	viper.SetConfigName("config")
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath(".")
+	_ = viper.ReadInConfig()
+}
+
 func main() {
+	initConfig()
+
 	repo, err := database.NewRepository(context.Background())
 	if err != nil {
 		log.Fatalf("Failed to initialize repository: %v", err)
@@ -252,7 +270,7 @@ func main() {
 			}
 
 			repo.SetCachedURL(c.Request.Context(), shortCode, input.URL, 24*time.Hour)
-			c.JSON(http.StatusOK, gin.H{"short_url": fmt.Sprintf("http://localhost:8080/%s", shortCode)})
+			c.JSON(http.StatusOK, gin.H{"short_url": fmt.Sprintf("%s/%s", viper.GetString("BASE_URL"), shortCode)})
 		})
 
 		protected.GET("/stats/:code", func(c *gin.Context) {
@@ -330,7 +348,7 @@ func main() {
 	}
 
 	srv := &http.Server{
-		Addr:    ":8080",
+		Addr:    ":" + viper.GetString("PORT"),
 		Handler: r,
 	}
 
