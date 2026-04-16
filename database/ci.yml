@@ -1,0 +1,41 @@
+name: Go Integration Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+          cache: true
+
+      - name: Install dependencies
+        run: go mod download
+
+      - name: Run all tests
+        # By default, go test runs in non-short mode, so integration tests will execute.
+        # We use -v to see Testcontainers pull images and initialize.
+        # -race is added for world-class concurrency checking.
+        run: go test -v -race ./...
+
+      - name: Build check
+        # Ensures the application compiles correctly in a clean environment.
+        run: go build -v -o /dev/null .
+
+    env:
+      # These match the default fallback values in your NewRepository logic,
+      # but can be explicitly set if your integration tests require specific overrides.
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable
+      REDIS_URL: localhost:6379

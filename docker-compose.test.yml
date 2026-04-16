@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  tester:
+    image: golang:1.25-alpine
+    working_dir: /app
+    volumes:
+      - .:/app
+    environment:
+      - CGO_ENABLED=0
+      - DOCKER_HOST=tcp://docker:2375
+    depends_on:
+      - docker
+    # We install docker-cli so Testcontainers can communicate with the host daemon.
+    # gcc and musl-dev are included to support the Go test toolchain if needed.
+    command: >
+      sh -c "apk add --no-cache docker-cli gcc musl-dev && go test -v ./..."
+
+  docker:
+    image: docker:dind
+    privileged: true
+    environment:
+      - DOCKER_TLS_CERTDIR=
