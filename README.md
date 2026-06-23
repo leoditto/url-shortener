@@ -11,6 +11,18 @@ A high-performance URL shortener built with Go, featuring PostgreSQL for persist
 - **Statistics**: Track hit counts for every shortened URL.
 - **Dockerized**: Ready for deployment with Docker and Docker Compose.
 
+## Architecture
+
+```mermaid
+graph LR
+    A[Client] -->|HTTP| B[Rate Limiter<br>Redis counter]
+    B --> C[Auth Middleware<br>JWT verify]
+    C --> D[Go API Server]
+    D -->|cache hit| E[(Redis Cache)]
+    D -->|cache miss| F[(PostgreSQL)]
+    F -->|backfill| E
+```
+
 ## Prerequisites
 
 - Docker and Docker Compose
